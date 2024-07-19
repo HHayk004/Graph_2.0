@@ -1,0 +1,25 @@
+Vertex - some object, that hold the information
+Edge - show relationship between the 2 Vertexes
+
+V - set of Vertexes
+E - set of Edges
+
+There are 2 types of graphs: undirected, directed and weighted
+and also: cycled (only for directed graphs)
+
+If graph has loop (vectex has edge to him), we call this graph subgraph
+
+Tree is also a graph
+Forest: combination of trees
+
+Graph has at least n - 1 edges
+
+Completed graph: every vertex has edge to every other vertex
+            has n * (n - 1) / 2 for undirected and n * (n - 1) for directed
+
+Homework
+Implement graph with 2 types of memory: adjusent list and adjusent matrix;
+Write dfs iterative (with stack) and recursive
+Write bfs (stack change with queue)
+
+read connected component and strongly connected component description
