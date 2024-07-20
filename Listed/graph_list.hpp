@@ -1,6 +1,6 @@
 Graph::Graph(const std::vector<std::pair<size_t, size_t>>& edges)
 {
-    for (auto [index1, index2] : edges)
+    for (const auto& [index1, index2] : edges)
     {
         addEdge(index1, index2);
     }
@@ -31,6 +31,7 @@ void Graph::removeEdge(const size_t& index1, const size_t& index2)
     if (vec[index1].find(index2) != vec[index1].end())
     {
         vec[index1].erase(index2);
+        vec[index2].erase(index1);
     }
 }
 
@@ -47,7 +48,7 @@ size_t Graph::vertexCount() const
 size_t Graph::edgeCount() const
 {
     size_t edges_count = 0;
-    for (auto elem : vec)
+    for (const auto& elem : vec)
     {
         edges_count += elem.size();
     }
@@ -89,7 +90,7 @@ void Graph::printDfsRecH(const size_t& index, std::vector<bool>& visited) const
 
     std::cout << index << ' ';
 
-    for (auto elem : vec[index])
+    for (auto& elem : vec[index])
     {
         if (!visited[elem])
         {
@@ -121,7 +122,7 @@ void Graph::printBfs(const size_t& index) const
 
         std::cout << curr << ' ';
 
-        for (auto elem : vec[curr])
+        for (auto& elem : vec[curr])
         {
             if (!visited[elem])
             {
