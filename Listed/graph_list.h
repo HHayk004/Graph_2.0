@@ -1,5 +1,5 @@
 #ifndef GRAPH_LIST_H
-#define GRAPH__LIST_H
+#define GRAPH_LIST_H
 
 #include <iostream>
 #include <vector>
@@ -12,7 +12,9 @@ class Graph
 {
 private:
     void printDfsRecH(const size_t& index2, std::vector<bool>& visited) const;
-    
+
+    std::vector<size_t> constructPath(const std::vector<size_t>& visited, size_t& dest) const;
+
 public:
     Graph() = default;
     Graph(const std::vector<std::pair<size_t,size_t>>& edges);
@@ -33,6 +35,8 @@ public:
     void printDfsRecursive(const size_t& index) const;
 
     void printBfs(const size_t& index) const;
+
+    std::vector<size_t> getShortPath(const size_t& source, size_t dest) const;
 
 private:
     std::vector<std::unordered_set<size_t>> vec;

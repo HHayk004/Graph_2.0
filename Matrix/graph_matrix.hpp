@@ -128,3 +128,50 @@ void Graph::printBfs(const size_t& index) const
 
     std::cout << std::endl;
 }
+
+std::vector<size_t> Graph::constructPath(const std::vector<size_t>& visited, size_t& dest) const
+{
+    std::vector<size_t> result;
+    while (dest != -1)
+    {
+        result.push_back(dest);
+        dest = visited[dest];
+    }
+
+    std::reverse(result.begin(), result.end());
+
+    return result;
+}
+
+std::vector<size_t> Graph::getShortPath(const size_t& source, size_t dest) const
+{
+    std::queue<size_t> indexes;
+    indexes.push(source);
+
+    std::vector<size_t> visited(vec.size(), 0);
+
+    visited[source] = -1;
+
+    while (!indexes.empty())
+    {
+        size_t curr = indexes.front();
+        indexes.pop();
+
+        for (int i = 0; i < vec.size(); ++i)
+        {
+            if (vec[curr][i] && !visited[i])
+            {
+                visited[i] = curr;
+
+                if (i == dest)
+                {
+                    return constructPath(visited, dest);
+                }
+
+                indexes.push(i);
+            }
+        }
+    }
+
+    return std::vector<size_t>();
+}
