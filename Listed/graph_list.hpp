@@ -282,3 +282,44 @@ std::vector<size_t> Graph::printLevelBfs(const size_t& index, size_t level) cons
 
     return result;
 }
+
+void Graph::allPathesRec(const size_t& source, const size_t& dest, std::vector<std::vector<size_t>>& result,
+                    std::vector<bool>& visited, std::vector<size_t>& path) const
+{
+    path.push_back(source);
+    visited[source] = true;
+
+    if (source == dest)
+    {
+        result.push_back(path);
+    }
+
+    else
+    {
+        for (auto& elem : vec[source])
+        {
+            if (!visited[elem])
+            {
+                allPathesRec(elem, dest, result, visited, path);
+            }
+        }
+    }
+
+    visited[source] = false;
+    path.pop_back();
+}
+
+std::vector<std::vector<size_t>> Graph::allPathes(const size_t& source, const size_t& dest) const
+{
+    std::vector<std::vector<size_t>> result;
+    std::vector<size_t> path;
+    std::vector<bool> visited(vec.size(), false);
+
+    allPathesRec(source, dest, result, visited, path);
+
+    std::sort(result.begin(), result.end(), [](const std::vector<size_t>& val1, const std::vector<size_t>& val2){
+        return val1.size() < val2.size();
+    });
+
+    return result;
+}

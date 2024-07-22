@@ -18,6 +18,9 @@ private:
 
     void levelRec(const size_t& index, const size_t& level, std::vector<bool>& visisted, std::vector<size_t>& result) const;
 
+    void allPathesRec(const size_t& source, const size_t& dest, std::vector<std::vector<size_t>>& result, 
+                        std::vector<bool>& visited, std::vector<size_t>& path) const;
+
 public:
     Graph() = default;
     Graph(const std::vector<std::pair<size_t,size_t>>& edges);
@@ -45,6 +48,8 @@ public:
     std::vector<size_t> printLevelBfs(const size_t& index, size_t level) const;
 
     std::vector<size_t> getShortPath(const size_t& source, size_t dest) const;
+
+    std::vector<std::vector<size_t>> allPathes(const size_t& source, const size_t& dest) const;
 
 private:
     std::vector<std::vector<bool>> vec;
