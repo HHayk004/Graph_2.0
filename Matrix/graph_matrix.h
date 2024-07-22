@@ -7,6 +7,7 @@
 #include <stack>
 #include <queue>
 #include <utility>
+#include <algorithm>
 
 class Graph
 {
@@ -14,6 +15,8 @@ private:
     void printDfsRecH(const size_t& index2, std::vector<bool>& visited) const;
     
     std::vector<size_t> constructPath(const std::vector<size_t>& visited, size_t& dest) const;
+
+    void levelRec(const size_t& index, const size_t& level, std::vector<bool>& visisted, std::vector<size_t>& result) const;
 
 public:
     Graph() = default;
@@ -28,6 +31,8 @@ public:
 
     void clear();
 
+    void transpose();
+
     size_t vertexCount() const;
     size_t edgeCount() const;
 
@@ -35,6 +40,9 @@ public:
     void printDfsRecursive(const size_t& index) const;
 
     void printBfs(const size_t& index) const;
+
+    std::vector<size_t> printLevelDfs(const size_t& index, const size_t& level) const; // have some questions
+    std::vector<size_t> printLevelBfs(const size_t& index, size_t level) const;
 
     std::vector<size_t> getShortPath(const size_t& source, size_t dest) const;
 

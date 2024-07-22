@@ -115,6 +115,8 @@ void Graph::printBfs(const size_t& index) const
     std::vector<bool> visited(vec.size(), false);
     visited[index] = true;
 
+    size_t size = 1;
+    size_t new_size = 0;
     while (!indexes.empty())
     {
         size_t curr = indexes.front();
@@ -126,13 +128,37 @@ void Graph::printBfs(const size_t& index) const
         {
             if (!visited[elem])
             {
+                ++new_size;
                 visited[elem] = true;
                 indexes.push(elem);
             }
         }
+
+        --size;
+        if (!size)
+        {
+            size = new_size;
+            new_size = 0;
+            std::cout << std::endl;
+        }
     }
 
     std::cout << std::endl;
+}
+
+void Graph::transpose()
+{
+    std::vector<std::unordered_set<size_t>> new_graph(vec.size());
+
+    for (int i = 0; i < vec.size(); ++i)
+    {
+        for (auto it = vec[i].begin(); it != vec[i].end(); ++it)
+        {
+            new_graph[*it].insert(i);
+        }
+    }
+
+    vec = std::move(new_graph);
 }
 
 std::vector<size_t> Graph::constructPath(const std::vector<size_t>& visited, size_t& dest) const
@@ -180,4 +206,79 @@ std::vector<size_t> Graph::getShortPath(const size_t& source, size_t dest) const
     }
 
     return std::vector<size_t>();
+}
+
+void Graph::levelRec(const size_t& index, const size_t& level, std::vector<bool>& visited, std::vector<size_t>& result) const
+{
+    visited[index] = true;
+
+    if (!level)
+    {
+        result.push_back(index);
+    }
+
+    else
+    {
+        for (const auto& elem : vec[index])
+        {
+            if (!visited[elem])
+            {
+                levelRec(elem, level - 1, visited, result);
+            }
+        }
+    }
+}
+
+std::vector<size_t> Graph::printLevelDfs(const size_t& index, const size_t& level) const
+{
+    std::vector<bool> visited(vec.size(), false);
+    std::vector<size_t> result;
+
+    levelRec(index, level, visited, result);
+
+    return result;
+}
+
+std::vector<size_t> Graph::printLevelBfs(const size_t& index, size_t level) const
+{
+    std::queue<size_t> indexes;
+    indexes.push(index);
+
+    std::vector<bool> visited(vec.size(), false);
+    visited[index] = true;
+
+    size_t size = 1;
+    size_t new_size = 0;
+    while (!indexes.empty() && level)
+    {
+        size_t curr = indexes.front();
+        indexes.pop();
+
+        for (auto& elem : vec[curr])
+        {
+            if (!visited[elem])
+            {
+                ++new_size;
+                visited[elem] = true;
+                indexes.push(elem);
+            }
+        }
+
+        --size;
+        if (!size)
+        {
+            --level;
+            size = new_size;
+            new_size = 0;
+        }
+    }
+
+    std::vector<size_t> result;
+    while (!indexes.empty())
+    {
+        result.push_back(indexes.front());
+        indexes.pop();
+    }
+
+    return result;
 }

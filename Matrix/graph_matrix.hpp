@@ -25,8 +25,8 @@ void Graph::addVertex(const size_t& add_size)
 
 void Graph::removeEdge(const size_t& index1, const size_t& index2)
 {
-    vec[index1][index2] = 0;
-    vec[index2][index1] = 0;
+    vec[index1][index2] = false;
+    vec[index2][index1] = false;
 }
 
 void Graph::clear()
@@ -109,6 +109,9 @@ void Graph::printBfs(const size_t& index) const
     std::vector<bool> visited(vec.size(), false);
     visited[index] = true;
 
+    size_t size = 1;
+    size_t new_size = 0;
+
     while (!indexes.empty())
     {
         size_t curr = indexes.front();
@@ -120,13 +123,37 @@ void Graph::printBfs(const size_t& index) const
         {
             if (vec[curr][i] && !visited[i])
             {
+                ++new_size;
                 visited[i] = true;
                 indexes.push(i);
             }
         }
+
+        --size;
+        if (!size)
+        {
+            size = new_size;
+            new_size = 0;
+            std::cout << std::endl;
+        }
     }
 
     std::cout << std::endl;
+}
+
+void Graph::transpose()
+{
+    std::vector<std::vector<bool>> new_graph(vec.size(), std::vector<bool>(vec.size(), false));
+
+    for (int i = 0; i < vec.size(); ++i)
+    {
+        for (int j = 0; j < vec.size(); ++j)
+        {
+            new_graph[i][j] = vec[j][i];
+        }
+    }
+
+    vec = std::move(new_graph);
 }
 
 std::vector<size_t> Graph::constructPath(const std::vector<size_t>& visited, size_t& dest) const
@@ -174,4 +201,80 @@ std::vector<size_t> Graph::getShortPath(const size_t& source, size_t dest) const
     }
 
     return std::vector<size_t>();
+}
+
+void Graph::levelRec(const size_t& index, const size_t& level, std::vector<bool>& visited, std::vector<size_t>& result) const
+{
+    visited[index] = true;
+
+    if (!level)
+    {
+        result.push_back(index);
+    }
+
+    else
+    {
+        for (int i = 0; i < vec.size(); ++i)
+        {
+            if (vec[index][i] && !visited[i])
+            {
+                levelRec(i, level - 1, visited, result);
+            }
+        }
+    }
+}
+
+std::vector<size_t> Graph::printLevelDfs(const size_t& index, const size_t& level) const
+{
+    std::vector<bool> visited(vec.size(), false);
+    std::vector<size_t> result;
+
+    levelRec(index, level, visited, result);
+    
+    return result;
+}
+
+std::vector<size_t> Graph::printLevelBfs(const size_t& index, size_t level) const
+{
+    std::queue<size_t> indexes;
+    indexes.push(index);
+
+    std::vector<bool> visited(vec.size(), false);
+    visited[index] = true;
+
+    size_t size = 1;
+    size_t new_size = 0;
+    while (!indexes.empty() && level)
+    {
+        size_t curr = indexes.front();
+        indexes.pop();
+
+        for (int i = 0; i < vec.size(); ++i)
+        {
+            if (vec[curr][i] && !visited[i])
+            {
+                ++new_size;
+                visited[i] = true;
+                indexes.push(i);
+            }
+        }
+
+        --size;
+        if (!size)
+        {
+            --level;
+            size = new_size;
+            new_size = 0;
+        }
+    }
+
+    std::vector<size_t> result;
+
+    while (!indexes.empty())
+    {
+        result.push_back(indexes.front());
+        indexes.pop();
+    }
+
+    return result;
 }
