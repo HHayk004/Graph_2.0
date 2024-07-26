@@ -16,10 +16,13 @@ private:
     
     std::vector<size_t> constructPath(const std::vector<size_t>& visited, size_t& dest) const;
 
-    void levelRec(const size_t& index, const size_t& level, std::vector<bool>& visisted, std::vector<size_t>& result) const;
+    void levelRec(const size_t& level, std::vector<bool>& visisted, std::vector<size_t>& result) const;
 
     void allPathesRec(const size_t& source, const size_t& dest, std::vector<std::vector<size_t>>& result, 
                         std::vector<bool>& visited, std::vector<size_t>& path) const;
+
+    bool hasCycleRec(const size_t& index, const size_t& parent,
+                     std::vector<bool>& visited, std::vector<bool>& tmp) const;
 
 public:
     Graph() = default;
@@ -50,6 +53,8 @@ public:
     std::vector<size_t> getShortPath(const size_t& source, size_t dest) const;
 
     std::vector<std::vector<size_t>> allPathes(const size_t& source, const size_t& dest) const;
+
+    bool hasCycle() const;
 
 private:
     std::vector<std::vector<bool>> vec;

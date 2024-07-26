@@ -203,33 +203,36 @@ std::vector<size_t> Graph::getShortPath(const size_t& source, size_t dest) const
     return std::vector<size_t>();
 }
 
-void Graph::levelRec(const size_t& index, const size_t& level, std::vector<bool>& visited, std::vector<size_t>& result) const
+void Graph::levelRec(const size_t& level, std::vector<bool>& visited, std::vector<size_t>& result) const
 {
-    visited[index] = true;
-
-    if (!level)
+    if (level)
     {
-        result.push_back(index);
-    }
-
-    else
-    {
-        for (int i = 0; i < vec.size(); ++i)
+        std::vector<size_t> new_level;
+        for (int elem : result)
         {
-            if (vec[index][i] && !visited[i])
+            for (int i = 0; i < vec.size(); ++i)
             {
-                levelRec(i, level - 1, visited, result);
+                if (vec[elem][i] && !visited[i])
+                {
+                    new_level.push_back(i);
+                    visited[i] = true;
+                }
             }
         }
+
+        result = std::move(new_level);
+        levelRec(level - 1, visited, result);
     }
 }
 
 std::vector<size_t> Graph::printLevelDfs(const size_t& index, const size_t& level) const
 {
     std::vector<bool> visited(vec.size(), false);
-    std::vector<size_t> result;
+    visited[index] = true;
 
-    levelRec(index, level, visited, result);
+    std::vector<size_t> result{index};
+
+    levelRec(level, visited, result);
     
     return result;
 }
@@ -318,4 +321,40 @@ std::vector<std::vector<size_t>> Graph::allPathes(const size_t& source, const si
     });
 
     return result;
+}
+
+bool Graph::hasCycleRec(const size_t& index, const size_t& parent,
+                        std::vector<bool>& visited, std::vector<bool>& path) const
+{
+    path[index] = true;
+    visited[index] = true;
+
+    for (int elem = 0; elem < vec.size(); ++elem)
+    {
+        if (vec[index][elem] && 
+            (elem != parent && path[elem] ||
+            !visited[elem] && hasCycleRec(elem, index, visited, path)))
+        {
+            return true;
+        }
+    }
+
+    path[index] = false;
+    return false;
+}
+
+bool Graph::hasCycle() const
+{
+    std::vector<bool> visited(vec.size(), false);
+    std::vector<bool> path(vec.size(), false);
+
+    for (int i = 0; i < vec.size(); ++i)
+    {
+        if (!visited[i] && hasCycleRec(i, -1, visited, path))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
