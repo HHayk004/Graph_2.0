@@ -1,4 +1,4 @@
-Graph::Graph(const std::vector<std::pair<size_t, size_t>>& edges)
+Graph::Graph(const std::vector<std::pair<size_t, size_t>>& edges, bool mode) : mode(mode)
 {
     for (const auto& [index1, index2] : edges)
     {
@@ -15,7 +15,11 @@ void Graph::addEdge(const size_t& index1, const size_t& index2)
     }
 
     vec[index1][index2] = true;
-    vec[index2][index1] = true;
+
+    if (!mode)
+    {
+        vec[index2][index1] = true;
+    }
 }
 
 void Graph::addVertex(const size_t& add_size)
@@ -26,7 +30,11 @@ void Graph::addVertex(const size_t& add_size)
 void Graph::removeEdge(const size_t& index1, const size_t& index2)
 {
     vec[index1][index2] = false;
-    vec[index2][index1] = false;
+
+    if (!mode)
+    {
+        vec[index2][index1] = false;
+    }
 }
 
 void Graph::clear()
@@ -357,4 +365,107 @@ bool Graph::hasCycle() const
     }
 
     return false;
+}
+
+bool Graph::topoRec(const size_t& i, std::vector<size_t>& result, std::vector<bool>& visited, std::vector<bool>& path) const
+{
+    visited[i] = true;
+    path[i] = true;
+
+    for (int elem = 0; elem < vec.size(); ++elem)
+    {
+        if (vec[i][elem])
+        {
+            if (!visited[elem])
+            {
+                if (topoRec(elem, result, visited, path))
+                {
+                    return true;
+                }
+            }
+
+            else if (path[elem])
+            {
+                return true;
+            }
+        }
+    }
+
+    result.push_back(i);
+
+    path[i] = false;
+
+    return false;
+}
+
+std::vector<size_t> Graph::topoDfs() const
+{
+    std::vector<bool> path(vec.size(), false);
+    std::vector<bool> visited(vec.size(), false);
+    std::vector<size_t> result;
+
+    for (int i = 0; i < vec.size(); ++i)
+    {
+        if (!visited[i] && topoRec(i, result, visited, path))
+        {
+            return std::vector<size_t>();
+        }
+    }
+
+    std::reverse(result.begin(), result.end());
+
+    return result;
+}
+
+std::vector<size_t> Graph::topoKahn() const
+{
+    std::vector<size_t> result;
+    
+    std::vector<size_t> parent(vec.size(), 0);
+    for (int i = 0; i < vec.size(); ++i)
+    {
+        for (int j = 0; j < vec.size(); ++j)
+        {
+            if (vec[i][j])
+            {
+                ++parent[j];
+            }
+        }
+    }
+
+    std::queue<size_t> indexes;
+
+    do
+    {
+        while (!indexes.empty())
+        {
+            result.push_back(indexes.front());
+            indexes.pop();
+        }
+
+        for (int i = 0; i < vec.size(); ++i)
+        {
+            if (!parent[i])
+            {
+                parent[i] = -1;
+                indexes.push(i);
+
+                for (int elem = 0; elem < vec.size(); ++elem)
+                {
+                    if (vec[i][elem])
+                    {
+                        --parent[elem];
+                    }
+                }
+            }
+        }
+
+    } while (!indexes.empty());
+
+    if (result.size() != vec.size())
+    {
+        return std::vector<size_t>();
+    }
+
+    return result;
 }

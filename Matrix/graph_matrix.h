@@ -23,10 +23,13 @@ private:
 
     bool hasCycleRec(const size_t& index, const size_t& parent,
                      std::vector<bool>& visited, std::vector<bool>& tmp) const;
+    
+    bool topoRec(const size_t& i, std::vector<size_t>& result,
+                std::vector<bool>& visited, std::vector<bool>& path) const;
 
 public:
     Graph() = default;
-    Graph(const std::vector<std::pair<size_t,size_t>>& edges);
+    Graph(const std::vector<std::pair<size_t,size_t>>& edges, bool mode = 0);
 
     ~Graph() = default;
 
@@ -56,8 +59,12 @@ public:
 
     bool hasCycle() const;
 
+    std::vector<size_t> topoDfs() const;
+    std::vector<size_t> topoKahn() const;
+
 private:
     std::vector<std::vector<bool>> vec;
+    bool mode;
 };
 
 #include "graph_matrix.hpp"
