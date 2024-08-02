@@ -552,42 +552,39 @@ std::vector<std::vector<size_t>> Graph::kosaraju() const
 
 void Graph::tarjanRec(const size_t& index, std::vector<std::vector<size_t>>& result, std::vector<bool>& visited,
                    std::stack<size_t>& st, size_t& ip, std::vector<long long>& ip_vec, std::vector<long long>& ll_vec) const
+{
+    ip_vec[index] = ll_vec[index] = ip++;
+    st.push(index);
+    visited[index] = true;
+
+    for (auto& elem : vec[index])
     {
-        ip_vec[index] = ll_vec[index] = ip++;
-        st.push(index);
-        visited[index] = true;
-
-        for (auto& elem : vec[index])
+        if (ip_vec[elem] == -1) 
         {
-            if (ip_vec[elem] == -1) 
-            {
-                tarjanRec(elem, result, visited, st, ip, ip_vec, ll_vec);
-                ll_vec[index] = std::min(ll_vec[index], ll_vec[elem]);
-            } 
-            
-            else if (visited[elem])
-            {
-                ll_vec[index] = std::min(ll_vec[index], ll_vec[elem]);
-            }
-        }
-
-        if (ip_vec[index] == ll_vec[index])
+            tarjanRec(elem, result, visited, st, ip, ip_vec, ll_vec);
+            ll_vec[index] = std::min(ll_vec[index], ll_vec[elem]);
+        } 
+        
+        else if (visited[elem])
         {
-            result.emplace_back();
-            while (!st.empty() && st.top() != index)
-            {
-                result.back().push_back(st.top());
-                visited[st.top()] = false;
-                st.pop();
-            }
-            
-            if (!st.empty())
-            {
-                result.back().push_back(st.top());
-                st.pop();
-            }
+            ll_vec[index] = std::min(ll_vec[index], ll_vec[elem]);
         }
     }
+
+    if (ip_vec[index] == ll_vec[index])
+    {
+        result.emplace_back();
+        while (st.top() != index)
+        {
+            result.back().push_back(st.top());
+            visited[st.top()] = false;
+            st.pop();
+        }
+        
+        result.back().push_back(st.top());
+        st.pop();
+    }
+}
 
 std::vector<std::vector<size_t>> Graph::tarjan() const
 {
