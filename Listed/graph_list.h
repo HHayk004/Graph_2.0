@@ -27,9 +27,18 @@ private:
     bool topoRec(const size_t& i, std::vector<size_t>& result,
                 std::vector<bool>& visited, std::vector<bool>& path) const;
 
+    void kosarajuRec(const size_t& index, std::vector<bool>& visited, std::stack<size_t>& st) const;
+    void kosarajuRec(const size_t& index, std::vector<bool>& visited, std::stack<size_t>& st,
+                    std::vector<std::vector<size_t>>& result) const;
+
+    void tarjanRec(const size_t& index, std::vector<std::vector<size_t>>& result, std::vector<bool>& visited,
+                std::stack<size_t>& st, size_t& ip, std::vector<long long>& ip_vec, std::vector<long long>& ll_vec) const;
+
 public:
     Graph() = default;
     Graph(const std::vector<std::pair<size_t,size_t>>& edges, bool mode = 0);
+    Graph(const Graph& gr) = default;
+    Graph(Graph&& gr) = default;
 
     ~Graph() = default;
 
@@ -37,6 +46,7 @@ public:
     void addVertex(const size_t& add_size = 1);
 
     void removeEdge(const size_t& index, const size_t& index2);
+    void removeVertex(const size_t& vertex);
 
     void clear();
 
@@ -61,6 +71,9 @@ public:
 
     std::vector<size_t> topoDfs() const;
     std::vector<size_t> topoKahn() const;
+
+    std::vector<std::vector<size_t>> kosaraju() const;
+    std::vector<std::vector<size_t>> tarjan() const;
 
 private:
     std::vector<std::unordered_set<size_t>> vec;

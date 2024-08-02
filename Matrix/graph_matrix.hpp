@@ -24,6 +24,11 @@ void Graph::addEdge(const size_t& index1, const size_t& index2)
 
 void Graph::addVertex(const size_t& add_size)
 {
+    for (int i = 0; i < vec.size(); ++i)
+    {
+        vec[i].resize(vec.size() + add_size);
+    }
+
     vec.resize(vec.size() + add_size, std::vector<bool>(vec.size() + add_size, false));
 }
 
@@ -34,6 +39,37 @@ void Graph::removeEdge(const size_t& index1, const size_t& index2)
     if (!mode)
     {
         vec[index2][index1] = false;
+    }
+}
+
+void Graph::removeVertex(const size_t& vertex)
+{
+    if (vertex < vec.size())
+    {
+        vec.erase(vec.begin() + vertex);
+    
+        for (int i = 0; i < vec.size(); ++i)
+        {
+            for (int j = vertex; j < vec[i].size(); ++j)
+            {
+                if (vec[i][j])
+                {
+                    if (j > vertex)
+                    {
+                        std::cout << j << std::endl;
+                        vec[i][j] = false;
+                        vec[i][j - 1] = true;
+                    }
+
+                    else if (j == vertex)
+                    {
+                        vec[i][vertex] = false;
+                    }
+                }
+            }
+
+            vec[i].pop_back();
+        }
     }
 }
 
@@ -466,6 +502,141 @@ std::vector<size_t> Graph::topoKahn() const
     {
         return std::vector<size_t>();
     }
+
+    return result;
+}
+
+void Graph::kosarajuRec(const size_t& index, std::vector<bool>& visited, std::stack<size_t>& st) const
+{
+    visited[index] = true;
+
+    for (size_t elem = 0; elem < vec.size(); ++elem)
+    {
+        if (vec[index][elem] && !visited[elem])
+        {
+            kosarajuRec(elem, visited, st);
+        }
+    }
+
+    st.push(index);
+}
+
+void Graph::kosarajuRec(const size_t& index, std::vector<bool>& visited, std::stack<size_t>& st, std::vector<std::vector<size_t>>& result) const
+{
+    visited[index] = true;
+
+    result.back().push_back(index);
+
+    for (size_t elem = 0; elem < vec.size(); ++elem)
+    {
+        if (vec[index][elem] && !visited[elem])
+        {
+            kosarajuRec(elem, visited, st, result);
+        }
+    }
+}
+
+std::vector<std::vector<size_t>> Graph::kosaraju() const
+{
+    std::vector<bool> visited(vec.size(), false);
+    std::stack<size_t> st;
+
+    for (size_t i = 0; i < vec.size(); ++i)
+    {
+        if (!visited[i])
+        {
+            kosarajuRec(i, visited, st);
+        }
+    }
+    std::cout << std::endl;
+
+    Graph tp = *this;
+
+    tp.transpose();
+
+    std::vector<std::vector<size_t>> result;
+
+    visited = std::vector<bool>(vec.size(), false);
+
+    while (!st.empty())
+    {
+        if (!visited[st.top()])
+        {
+            result.emplace_back();
+            tp.kosarajuRec(st.top(), visited, st, result);
+        }
+
+        st.pop();
+    }
+
+    return result;
+}
+
+void Graph::tarjanRec(const size_t& index, std::vector<std::vector<size_t>>& result, std::vector<bool>& visited,
+                   std::stack<size_t>& st, size_t& ip, std::vector<long long>& ip_vec, std::vector<long long>& ll_vec) const
+    {
+        ip_vec[index] = ll_vec[index] = ip++;
+        st.push(index);
+        visited[index] = true;
+
+        for (size_t elem = 0; elem < vec.size(); ++elem)
+        {
+            if (vec[index][elem])
+            {
+                if (ip_vec[elem] == -1) 
+                {
+                    tarjanRec(elem, result, visited, st, ip, ip_vec, ll_vec);
+                    ll_vec[index] = std::min(ll_vec[index], ll_vec[elem]);
+                }  
+            
+                else if (visited[elem])
+                {
+                    ll_vec[index] = std::min(ll_vec[index], ll_vec[elem]);
+                }
+            }
+        }
+
+        if (ip_vec[index] == ll_vec[index])
+        {
+            result.emplace_back();
+            while (!st.empty() && st.top() != index)
+            {
+                result.back().push_back(st.top());
+                visited[st.top()] = false;
+                st.pop();
+            }
+            
+            if (!st.empty())
+            {
+                result.back().push_back(st.top());
+                st.pop();
+            }
+        }
+    }
+
+std::vector<std::vector<size_t>> Graph::tarjan() const
+{
+    std::vector<long long> ip_vec(vec.size(), -1);
+    std::vector<long long> ll_vec(vec.size(), -1);
+
+    std::vector<bool> visited(vec.size(), false);
+    std::stack<size_t> st;
+
+    std::vector<std::vector<size_t>> result;
+
+    size_t ip = 0;
+    for (int i = 0; i < vec.size(); ++i)
+    {
+        if (ip_vec[i] == -1)
+        {
+            tarjanRec(i, result, visited, st, ip, ip_vec, ll_vec);
+        }
+    }
+
+    // for (int i = 0; i < vec.size(); ++i)
+    // {
+    //     std::cout << i << ": " << ip_vec[i] << ' ' << ll_vec[i] << std::endl;
+    // } for checking if ll values for each SCC is the same (not)
 
     return result;
 }
