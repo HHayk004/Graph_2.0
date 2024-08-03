@@ -94,6 +94,23 @@
         "future": "cpp",
         "shared_mutex": "cpp",
         "stdfloat": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "barrier": "cpp",
+        "cfenv": "cpp",
+        "coroutine": "cpp",
+        "csetjmp": "cpp",
+        "csignal": "cpp",
+        "cuchar": "cpp",
+        "expected": "cpp",
+        "regex": "cpp",
+        "generator": "cpp",
+        "latch": "cpp",
+        "print": "cpp",
+        "ranges": "cpp",
+        "scoped_allocator": "cpp",
+        "spanstream": "cpp",
+        "stacktrace": "cpp",
+        "syncstream": "cpp",
+        "typeindex": "cpp"
     }
 }

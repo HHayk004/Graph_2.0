@@ -1,12 +1,12 @@
-Graph::Graph(const std::vector<std::pair<size_t, size_t>>& edges, bool mode) : mode(mode)
+Graph::Graph(const std::vector<std::tuple<size_t, size_t, size_t>>& edges, bool mode) : mode(mode)
 {
-    for (const auto& [index1, index2] : edges)
+    for (const auto& [index1, index2, w] : edges)
     {
-        addEdge(index1, index2);
+        addEdge(index1, index2, w);
     }
 }
 
-void Graph::addEdge(const size_t& index1, const size_t& index2)
+void Graph::addEdge(const size_t& index1, const size_t& index2, const size_t& w)
 {
     size_t max = std::max(index1, index2);
     if (max >= vec.size())
@@ -14,11 +14,11 @@ void Graph::addEdge(const size_t& index1, const size_t& index2)
         addVertex(max - vec.size() + 1);
     }
 
-    vec[index1].insert(index2);
+    vec[index1][index2] = w;
 
     if (!mode)
     {
-        vec[index2].insert(index1);
+        vec[index2][index1] = w;
     }
 }
 
@@ -49,12 +49,12 @@ void Graph::removeVertex(const size_t& vertex)
         for (int i = 0; i < vec.size(); ++i)
         {
             vec[i].erase(vertex);
-            for (int val : vec[i])
+            for (auto& val : vec[i])
             {
-                if (val > vertex)
+                if (val.first > vertex)
                 {
-                    vec[i].erase(val);
-                    vec[i].insert(val - 1);
+                    vec[i][val.first - 1] = vec[i][val.first];
+                    vec[i].erase(val.first);
                 }
             }
         }
@@ -99,10 +99,10 @@ void Graph::printDfsIterative(const size_t& index) const
 
         for (auto& elem : vec[curr])
         {
-            if (!visited[elem])
+            if (!visited[elem.first])
             {
-                visited[elem] = true;
-                indexes.push(elem);
+                visited[elem.first] = true;
+                indexes.push(elem.first);
             }
         }
     }
@@ -118,9 +118,9 @@ void Graph::printDfsRecH(const size_t& index, std::vector<bool>& visited) const
 
     for (auto& elem : vec[index])
     {
-        if (!visited[elem])
+        if (!visited[elem.first])
         {
-            printDfsRecH(elem, visited);
+            printDfsRecH(elem.first, visited);
         }
     }
 }
@@ -152,11 +152,11 @@ void Graph::printBfs(const size_t& index) const
 
         for (auto& elem : vec[curr])
         {
-            if (!visited[elem])
+            if (!visited[elem.first])
             {
                 ++new_size;
-                visited[elem] = true;
-                indexes.push(elem);
+                visited[elem.first] = true;
+                indexes.push(elem.first);
             }
         }
 
@@ -174,13 +174,13 @@ void Graph::printBfs(const size_t& index) const
 
 void Graph::transpose()
 {
-    std::vector<std::unordered_set<size_t>> new_graph(vec.size());
+    std::vector<std::unordered_map<size_t, size_t>> new_graph(vec.size());
 
     for (int i = 0; i < vec.size(); ++i)
     {
         for (auto it = vec[i].begin(); it != vec[i].end(); ++it)
         {
-            new_graph[*it].insert(i);
+            new_graph[it->first][i] = it->second;
         }
     }
 
@@ -201,39 +201,6 @@ std::vector<size_t> Graph::constructPath(const std::vector<size_t>& visited, siz
     return result;
 }
 
-std::vector<size_t> Graph::getShortPath(const size_t& source, size_t dest) const
-{
-    std::queue<size_t> indexes;
-    indexes.push(source);
-
-    std::vector<size_t> visited(vec.size(), 0);
-
-    visited[source] = -1;
-
-    while (!indexes.empty())
-    {
-        size_t curr = indexes.front();
-        indexes.pop();
-
-        for (auto& elem : vec[curr])
-        {
-            if (!visited[elem])
-            {
-                visited[elem] = curr;
-
-                if (elem == dest)
-                {
-                    return constructPath(visited, dest);
-                }
-
-                indexes.push(elem);
-            }
-        }
-    }
-
-    return std::vector<size_t>();
-}
-
 void Graph::levelRec(const size_t& level, std::vector<bool>& visited, std::vector<size_t>& result) const
 {
     if (level)
@@ -243,10 +210,10 @@ void Graph::levelRec(const size_t& level, std::vector<bool>& visited, std::vecto
         {
             for (auto& i : vec[elem])
             {
-                if (!visited[i])
+                if (!visited[i.first])
                 {
-                    new_level.push_back(i);
-                    visited[i] = true;
+                    new_level.push_back(i.first);
+                    visited[i.first] = true;
                 }
             }
         }
@@ -285,11 +252,11 @@ std::vector<size_t> Graph::printLevelBfs(const size_t& index, size_t level) cons
 
         for (auto& elem : vec[curr])
         {
-            if (!visited[elem])
+            if (!visited[elem.first])
             {
                 ++new_size;
-                visited[elem] = true;
-                indexes.push(elem);
+                visited[elem.first] = true;
+                indexes.push(elem.first);
             }
         }
 
@@ -313,23 +280,25 @@ std::vector<size_t> Graph::printLevelBfs(const size_t& index, size_t level) cons
 }
 
 void Graph::allPathesRec(const size_t& source, const size_t& dest, std::vector<std::vector<size_t>>& result,
-                    std::vector<bool>& visited, std::vector<size_t>& path) const
+                    std::vector<bool>& visited, std::vector<size_t>& path, size_t w) const
 {
     path.push_back(source);
     visited[source] = true;
 
     if (source == dest)
     {
+        path.push_back(w);
         result.push_back(path);
+        path.pop_back();
     }
 
     else
     {
         for (auto& elem : vec[source])
         {
-            if (!visited[elem])
+            if (!visited[elem.first])
             {
-                allPathesRec(elem, dest, result, visited, path);
+                allPathesRec(elem.first, dest, result, visited, path, w + elem.second);
             }
         }
     }
@@ -344,7 +313,7 @@ std::vector<std::vector<size_t>> Graph::allPathes(const size_t& source, const si
     std::vector<size_t> path;
     std::vector<bool> visited(vec.size(), false);
 
-    allPathesRec(source, dest, result, visited, path);
+    allPathesRec(source, dest, result, visited, path, 0);
 
     std::sort(result.begin(), result.end(), [](const std::vector<size_t>& val1, const std::vector<size_t>& val2){
         return val1.size() < val2.size();
@@ -361,8 +330,8 @@ bool Graph::hasCycleRec(const size_t& index, const size_t& parent,
 
     for (auto& elem : vec[index])
     {
-        if (elem != parent && path[elem] ||
-            !visited[elem] && hasCycleRec(elem, index, visited, path))
+        if (elem.first != parent && path[elem.first] ||
+            !visited[elem.first] && hasCycleRec(elem.first, index, visited, path))
         {
             return true;
         }
@@ -395,15 +364,15 @@ bool Graph::topoRec(const size_t& i, std::vector<size_t>& result, std::vector<bo
 
     for (auto& elem : vec[i])
     {
-        if (!visited[elem])
+        if (!visited[elem.first])
         {
-            if (topoRec(elem, result, visited, path))
+            if (topoRec(elem.first, result, visited, path))
             {
                 return true;
             }
         }
 
-        else if (path[elem])
+        else if (path[elem.first])
         {
             return true;
         }
@@ -444,7 +413,7 @@ std::vector<size_t> Graph::topoKahn() const
     {
         for (auto& elem : vec[i])
         {
-            ++parent[elem];
+            ++parent[elem.first];
         }
     }
 
@@ -467,7 +436,7 @@ std::vector<size_t> Graph::topoKahn() const
 
                 for (auto& elem : vec[i])
                 {
-                    --parent[elem];
+                    --parent[elem.first];
                 }
             }
         }
@@ -487,9 +456,9 @@ void Graph::kosarajuRec(const size_t& index, std::vector<bool>& visited, std::st
 
     for (auto& elem : vec[index])
     {
-        if (!visited[elem])
+        if (!visited[elem.first])
         {
-            kosarajuRec(elem, visited, st);
+            kosarajuRec(elem.first, visited, st);
         }
     }
 
@@ -504,9 +473,9 @@ void Graph::kosarajuRec(const size_t& index, std::vector<bool>& visited, std::st
 
     for (auto& elem : vec[index])
     {
-        if (!visited[elem])
+        if (!visited[elem.first])
         {
-            kosarajuRec(elem, visited, st, result);
+            kosarajuRec(elem.first, visited, st, result);
         }
     }
 }
@@ -548,39 +517,42 @@ std::vector<std::vector<size_t>> Graph::kosaraju() const
 
 void Graph::tarjanRec(const size_t& index, std::vector<std::vector<size_t>>& result, std::vector<bool>& visited,
                    std::stack<size_t>& st, size_t& ip, std::vector<long long>& ip_vec, std::vector<long long>& ll_vec) const
-{
-    ip_vec[index] = ll_vec[index] = ip++;
-    st.push(index);
-    visited[index] = true;
-
-    for (auto& elem : vec[index])
     {
-        if (ip_vec[elem] == -1) 
+        ip_vec[index] = ll_vec[index] = ip++;
+        st.push(index);
+        visited[index] = true;
+
+        for (auto& elem : vec[index])
         {
-            tarjanRec(elem, result, visited, st, ip, ip_vec, ll_vec);
-            ll_vec[index] = std::min(ll_vec[index], ll_vec[elem]);
-        } 
-        
-        else if (visited[elem])
+            if (ip_vec[elem.first] == -1) 
+            {
+                tarjanRec(elem.first, result, visited, st, ip, ip_vec, ll_vec);
+                ll_vec[index] = std::min(ll_vec[index], ll_vec[elem.first]);
+            } 
+            
+            else if (visited[elem.first])
+            {
+                ll_vec[index] = std::min(ll_vec[index], ll_vec[elem.first]);
+            }
+        }
+
+        if (ip_vec[index] == ll_vec[index])
         {
-            ll_vec[index] = std::min(ll_vec[index], ll_vec[elem]);
+            result.emplace_back();
+            while (!st.empty() && st.top() != index)
+            {
+                result.back().push_back(st.top());
+                visited[st.top()] = false;
+                st.pop();
+            }
+            
+            if (!st.empty())
+            {
+                result.back().push_back(st.top());
+                st.pop();
+            }
         }
     }
-
-    if (ip_vec[index] == ll_vec[index])
-    {
-        result.emplace_back();
-        while (st.top() != index)
-        {
-            result.back().push_back(st.top());
-            visited[st.top()] = false;
-            st.pop();
-        }
-        
-        result.back().push_back(st.top());
-        st.pop();
-    }
-}
 
 std::vector<std::vector<size_t>> Graph::tarjan() const
 {

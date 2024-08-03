@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 #include <stack>
 #include <queue>
 #include <utility>
@@ -12,17 +13,17 @@ class Graph
 {
 private:
     void printDfsRecH(const size_t& index2, std::vector<bool>& visited) const;
-    
+
     std::vector<size_t> constructPath(const std::vector<size_t>& visited, size_t& dest) const;
 
     void levelRec(const size_t& level, std::vector<bool>& visisted, std::vector<size_t>& result) const;
 
     void allPathesRec(const size_t& source, const size_t& dest, std::vector<std::vector<size_t>>& result, 
-                        std::vector<bool>& visited, std::vector<size_t>& path) const;
+                    std::vector<bool>& visited, std::vector<size_t>& path, size_t w) const;
 
     bool hasCycleRec(const size_t& index, const size_t& parent,
-                     std::vector<bool>& visited, std::vector<bool>& tmp) const;
-    
+                    std::vector<bool>& visited, std::vector<bool>& path) const;
+
     bool topoRec(const size_t& i, std::vector<size_t>& result,
                 std::vector<bool>& visited, std::vector<bool>& path) const;
 
@@ -35,13 +36,13 @@ private:
 
 public:
     Graph() = default;
-    Graph(const std::vector<std::pair<size_t, size_t>>& edges, bool mode = 0);
+    Graph(const std::vector<std::tuple<size_t, size_t, size_t>>& edges, bool mode = 0);
     Graph(const Graph& gr) = default;
     Graph(Graph&& gr) = default;
 
     ~Graph() = default;
 
-    void addEdge(const size_t& index1, const size_t& index2);
+    void addEdge(const size_t& index1, const size_t& index2, const size_t& w);
     void addVertex(const size_t& add_size = 1);
 
     void removeEdge(const size_t& index, const size_t& index2);
@@ -62,8 +63,6 @@ public:
     std::vector<size_t> printLevelDfs(const size_t& index, const size_t& level) const; // have some questions
     std::vector<size_t> printLevelBfs(const size_t& index, size_t level) const;
 
-    std::vector<size_t> getShortPath(const size_t& source, size_t dest) const;
-
     std::vector<std::vector<size_t>> allPathes(const size_t& source, const size_t& dest) const;
 
     bool hasCycle() const;
@@ -75,10 +74,10 @@ public:
     std::vector<std::vector<size_t>> tarjan() const;
 
 private:
-    std::vector<std::vector<bool>> vec;
+    std::vector<std::unordered_map<size_t, size_t>> vec;
     bool mode;
 };
 
-#include "graph_matrix.hpp"
+#include "graph_list_w.hpp"
 
 #endif

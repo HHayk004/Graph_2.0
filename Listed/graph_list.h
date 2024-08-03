@@ -35,7 +35,7 @@ private:
 
 public:
     Graph() = default;
-    Graph(const std::vector<std::pair<size_t,size_t>>& edges, bool mode = 0);
+    Graph(const std::vector<std::pair<size_t, size_t>>& edges, bool mode = 0);
     Graph(const Graph& gr) = default;
     Graph(Graph&& gr) = default;
 

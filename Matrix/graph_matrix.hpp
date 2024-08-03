@@ -56,7 +56,6 @@ void Graph::removeVertex(const size_t& vertex)
                 {
                     if (j > vertex)
                     {
-                        std::cout << j << std::endl;
                         vec[i][j] = false;
                         vec[i][j - 1] = true;
                     }
