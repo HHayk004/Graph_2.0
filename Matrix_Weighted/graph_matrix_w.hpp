@@ -606,3 +606,32 @@ std::vector<std::vector<size_t>> Graph::tarjan() const
 
     return result;
 }
+
+std::vector<size_t> Graph::SSSP(const size_t& source) const
+{
+    std::vector<size_t> topo_sort = topoKahn();
+
+    if (topo_sort.empty())
+    {
+        return std::vector<size_t>();
+    }
+
+    std::vector<size_t> result(vec.size(), std::numeric_limits<size_t>::max());
+    result[source] = 0;
+
+    for (auto& val : topo_sort)
+    {
+        if (result[val] != std::numeric_limits<size_t>::max())
+        {
+            for (int elem = 0; elem < vec.size(); ++elem)
+            {
+                if (vec[val][elem])
+                {
+                    result[elem] = std::min(result[elem], result[val] + vec[val][elem]);
+                }
+            }
+        }
+    }
+
+    return result;
+}

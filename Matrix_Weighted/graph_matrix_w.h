@@ -7,6 +7,7 @@
 #include <queue>
 #include <utility>
 #include <algorithm>
+#include <limits>
 
 class Graph
 {
@@ -70,7 +71,9 @@ public:
     std::vector<size_t> topoKahn() const;
 
     std::vector<std::vector<size_t>> kosaraju() const;
-    std::vector<std::vector<size_t>> tarjan() const;
+    std::vector<std::vector<size_t>> tarjan() const; 
+
+    std::vector<size_t> SSSP(const size_t& source) const;
 
 private:
     std::vector<std::vector<size_t>> vec;
