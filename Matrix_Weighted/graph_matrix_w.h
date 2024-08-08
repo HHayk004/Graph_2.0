@@ -75,6 +75,7 @@ public:
 
     std::vector<long long> SSSP(const size_t& source) const;
     std::vector<std::pair<std::vector<size_t>, long long>> dijkstra(const size_t& source) const;
+    std::vector<std::pair<std::vector<size_t>, long long>> bellmanFord(const size_t& source) const;
 
 private:
     std::vector<std::vector<long long>> vec;

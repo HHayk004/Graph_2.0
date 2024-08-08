@@ -616,29 +616,58 @@ std::vector<std::pair<std::vector<size_t>, long long>> Graph::dijkstra(const siz
 
     auto cmp = [](const std::pair<size_t, long long>& pair1, const std::pair<size_t, long long>& pair2) -> bool
     {
-        return pair1.second < pair2.second;
+        return pair1.second > pair2.second;
     };
 
     std::priority_queue<std::pair<size_t, long long>, std::vector<std::pair<size_t, long long>>, decltype(cmp)> pq(cmp);
-
     pq.emplace(source, 0);
+
+    std::vector<bool> visited(vec.size(), false);
 
     while (!pq.empty())
     {
         auto p = pq.top();
         pq.pop();
 
-        if (p.second <= result[p.first].second)
-        {
-            for (auto& elem : vec[p.first])
-            {
-                if (result[p.first].second + elem.second < result[elem.first].second)
-                {
-                    result[elem.first].first = result[p.first].first;
-                    result[elem.first].first.push_back(elem.first);
-                    result[elem.first].second = result[p.first].second + elem.second;
+        visited[p.first] = true;
 
-                    pq.push({elem.first, result[p.first].second + elem.second, });
+        for (auto& elem : vec[p.first])
+        {
+            if (!visited[elem.first] && result[p.first].second + elem.second < result[elem.first].second)
+            {
+                result[elem.first].first = result[p.first].first;
+                result[elem.first].first.push_back(elem.first);
+                result[elem.first].second = result[p.first].second + elem.second;
+
+                pq.push({elem.first, result[p.first].second + elem.second});
+            }
+        }        
+    }
+
+    return result;
+}
+
+std::vector<std::pair<std::vector<size_t>, long long>> Graph::bellmanFord(const size_t& source) const
+{
+    std::vector<std::pair<std::vector<size_t>, long long>> result(vec.size(), {std::vector<size_t>(), std::numeric_limits<long long>::max()});
+    result[source].second = 0;
+
+    result[source].first.push_back(source);
+
+    for (int i = 1; i < vec.size(); ++i)
+    {
+        for (int j = 0; j < vec.size(); ++j)
+        {
+            if (result[j].second != std::numeric_limits<long long>::max())
+            {
+                for (auto& elem : vec[j])
+                {
+                    if (result[j].second + elem.second < result[elem.first].second)
+                    {
+                        result[elem.first].first = result[j].first;
+                        result[elem.first].first.push_back(elem.first);
+                        result[elem.first].second = result[j].second + elem.second;
+                    }
                 }
             }
         }
