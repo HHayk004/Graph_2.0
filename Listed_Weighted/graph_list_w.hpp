@@ -174,7 +174,7 @@ void Graph::printBfs(const size_t& index) const
 
 void Graph::transpose()
 {
-    std::vector<std::unordered_map<size_t, size_t>> new_graph(vec.size());
+    std::vector<std::unordered_map<size_t, long long>> new_graph(vec.size());
 
     for (int i = 0; i < vec.size(); ++i)
     {
@@ -581,16 +581,16 @@ std::vector<std::vector<size_t>> Graph::tarjan() const
     return result;
 }
 
-std::vector<size_t> Graph::SSSP(const size_t& source) const
+std::vector<long long> Graph::SSSP(const size_t& source) const
 {
     std::vector<size_t> topo_sort = topoKahn();
 
     if (topo_sort.empty())
     {
-        return std::vector<size_t>();
+        return std::vector<long long>();
     }
 
-    std::vector<size_t> result(vec.size(), std::numeric_limits<size_t>::max());
+    std::vector<long long> result(vec.size(), std::numeric_limits<size_t>::max());
     result[source] = 0;
 
     for (auto& val : topo_sort)
@@ -600,6 +600,46 @@ std::vector<size_t> Graph::SSSP(const size_t& source) const
             for (auto& elem : vec[val])
             {
                 result[elem.first] = std::min(result[elem.first], result[val] + elem.second);
+            }
+        }
+    }
+
+    return result;
+}
+
+std::vector<std::pair<std::vector<size_t>, long long>> Graph::dijkstra(const size_t& source) const
+{
+    std::vector<std::pair<std::vector<size_t>, long long>> result(vec.size(), {std::vector<size_t>(), std::numeric_limits<long long>::max()});
+    result[source].second = 0;
+
+    result[source].first.push_back(source);
+
+    auto cmp = [](const std::pair<size_t, long long>& pair1, const std::pair<size_t, long long>& pair2) -> bool
+    {
+        return pair1.second < pair2.second;
+    };
+
+    std::priority_queue<std::pair<size_t, long long>, std::vector<std::pair<size_t, long long>>, decltype(cmp)> pq(cmp);
+
+    pq.emplace(source, 0);
+
+    while (!pq.empty())
+    {
+        auto p = pq.top();
+        pq.pop();
+
+        if (p.second <= result[p.first].second)
+        {
+            for (auto& elem : vec[p.first])
+            {
+                if (result[p.first].second + elem.second < result[elem.first].second)
+                {
+                    result[elem.first].first = result[p.first].first;
+                    result[elem.first].first.push_back(elem.first);
+                    result[elem.first].second = result[p.first].second + elem.second;
+
+                    pq.push({elem.first, result[p.first].second + elem.second, });
+                }
             }
         }
     }

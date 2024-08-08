@@ -73,10 +73,11 @@ public:
     std::vector<std::vector<size_t>> kosaraju() const;
     std::vector<std::vector<size_t>> tarjan() const; 
 
-    std::vector<size_t> SSSP(const size_t& source) const;
+    std::vector<long long> SSSP(const size_t& source) const;
+    std::vector<std::pair<std::vector<size_t>, long long>> dijkstra(const size_t& source) const;
 
 private:
-    std::vector<std::vector<size_t>> vec;
+    std::vector<std::vector<long long>> vec;
     bool mode;
 };
 

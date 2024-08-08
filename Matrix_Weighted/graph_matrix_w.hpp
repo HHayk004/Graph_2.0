@@ -29,7 +29,7 @@ void Graph::addVertex(const size_t& add_size)
         vec[i].resize(vec.size() + add_size);
     }
 
-    vec.resize(vec.size() + add_size, std::vector<size_t>(vec.size() + add_size, 0));
+    vec.resize(vec.size() + add_size, std::vector<long long>(vec.size() + add_size, 0));
 }
 
 void Graph::removeEdge(const size_t& index1, const size_t& index2)
@@ -186,7 +186,7 @@ void Graph::printBfs(const size_t& index) const
 
 void Graph::transpose()
 {
-    std::vector<std::vector<size_t>> new_graph(vec.size(), std::vector<size_t>(vec.size(), 0));
+    std::vector<std::vector<long long>> new_graph(vec.size(), std::vector<long long>(vec.size(), 0));
 
     for (int i = 0; i < vec.size(); ++i)
     {
@@ -607,27 +607,67 @@ std::vector<std::vector<size_t>> Graph::tarjan() const
     return result;
 }
 
-std::vector<size_t> Graph::SSSP(const size_t& source) const
+std::vector<long long> Graph::SSSP(const size_t& source) const
 {
     std::vector<size_t> topo_sort = topoKahn();
 
     if (topo_sort.empty())
     {
-        return std::vector<size_t>();
+        return std::vector<long long>();
     }
 
-    std::vector<size_t> result(vec.size(), std::numeric_limits<size_t>::max());
+    std::vector<long long> result(vec.size(), std::numeric_limits<long long>::max());
     result[source] = 0;
 
     for (auto& val : topo_sort)
     {
-        if (result[val] != std::numeric_limits<size_t>::max())
+        if (result[val] != std::numeric_limits<long long>::max())
         {
             for (int elem = 0; elem < vec.size(); ++elem)
             {
                 if (vec[val][elem])
                 {
                     result[elem] = std::min(result[elem], result[val] + vec[val][elem]);
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
+std::vector<std::pair<std::vector<size_t>, long long>> Graph::dijkstra(const size_t& source) const
+{
+    std::vector<std::pair<std::vector<size_t>, long long>> result(vec.size(), {std::vector<size_t>(), std::numeric_limits<long long>::max()});
+    result[source].second = 0;
+
+    result[source].first.push_back(source);
+
+    auto cmp = [](const std::pair<size_t, long long>& pair1, const std::pair<size_t, long long>& pair2) -> bool
+    {
+        return pair1.second < pair2.second;
+    };
+
+    std::priority_queue<std::pair<size_t, long long>, std::vector<std::pair<size_t, long long>>, decltype(cmp)> pq(cmp);
+
+    pq.emplace(source, 0);
+
+    while (!pq.empty())
+    {
+        auto p = pq.top();
+        pq.pop();
+
+        if (p.second <= result[p.first].second)
+        {
+            for (int elem = 0; elem < vec.size(); ++elem)
+            {
+                if (vec[p.first][elem] && result[p.first].second + vec[p.first][elem] < result[elem].second)
+                {
+                    result[elem].first = result[p.first].first;
+                    result[elem].first.push_back(elem);
+                    result[elem].second = result[p.first].second + vec[p.first][elem];
+
+                    pq.push({elem, result[p.first].second + vec[p.first][elem]});
                 }
             }
         }
