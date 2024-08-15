@@ -675,3 +675,55 @@ std::vector<std::pair<std::vector<size_t>, long long>> Graph::bellmanFord(const 
 
     return result;
 }
+
+Graph Graph::Prim() const
+{
+    typedef std::vector<long long> pq_type;
+    Graph result;
+    result.vec = std::vector<std::unordered_map<size_t, long long>>(vec.size());
+
+    auto cmp = [](const pq_type& elem1, const pq_type& elem2) -> bool
+    {
+        return elem1[2] > elem2[2];
+    };
+
+    std::vector<bool> visited(vec.size(), false);
+    for (int i = 0; i < vec.size(); ++i)
+    {
+        if (!visited[i])
+        {
+            visited[i] = true;
+
+            std::priority_queue<pq_type, std::vector<pq_type>, decltype(cmp)> pq(cmp);
+            for (auto& elem : vec[i])
+            {
+                pq.push({i, static_cast<long long>(elem.first), elem.second});
+            }
+
+            while (!pq.empty())
+            {
+                auto p = pq.top();
+                pq.pop();
+
+                if (visited[p[1]])
+                {
+                    continue;
+                }
+
+                result.addEdge(p[0], p[1], p[2]);
+
+                visited[p[1]] = true;
+
+                for (auto& elem : vec[p[1]])
+                {
+                    if (!visited[elem.first])
+                    {
+                        pq.push({p[1], static_cast<long long>(elem.first), elem.second});
+                    }
+                }
+            }
+        }
+    }
+
+    return result;
+}

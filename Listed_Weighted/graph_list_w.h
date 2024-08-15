@@ -78,6 +78,9 @@ public:
     std::vector<std::pair<std::vector<size_t>, long long>> dijkstra(const size_t& source) const;
     std::vector<std::pair<std::vector<size_t>, long long>> bellmanFord(const size_t& source) const;
 
+    Graph Prim() const;
+    Graph Kruskal() const;
+
 private:
     std::vector<std::unordered_map<size_t, long long>> vec;
     bool mode;
