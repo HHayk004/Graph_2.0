@@ -82,6 +82,19 @@ size_t Graph::edgeCount() const
     return edges_count;
 }
 
+void Graph::printGraph() const
+{
+    for (int i = 0; i < vec.size(); ++i)
+    {
+        std::cout << i << " - ";
+        for (auto& elem : vec[i])
+        {
+            std::cout << elem.first << ' ' << elem.second << ':';
+        }
+        std::cout << std::endl;
+    }
+}
+
 void Graph::printDfsIterative(const size_t& index) const
 {
     std::stack<size_t> indexes;
@@ -680,7 +693,6 @@ Graph Graph::Prim() const
 {
     typedef std::vector<long long> pq_type;
     Graph result;
-    result.vec = std::vector<std::unordered_map<size_t, long long>>(vec.size());
 
     auto cmp = [](const pq_type& elem1, const pq_type& elem2) -> bool
     {
@@ -722,6 +734,79 @@ Graph Graph::Prim() const
                     }
                 }
             }
+        }
+    }
+
+    return result;
+}
+
+Graph::Union::Union(const size_t& size) : parents(std::vector<size_t>(size)), sizes(std::vector<size_t>(size, 1))
+{
+    for (int i = 0; i < size; ++i)
+    {
+        parents[i] = i;
+    }
+}
+
+size_t Graph::Union::findParent(const size_t& u)
+{
+    if (parents[u] != u)
+    {
+        parents[u] = findParent(parents[u]);
+    }
+
+    return parents[u];
+}
+
+bool Graph::Union::unionFind(const size_t& u, const size_t& v)
+{
+    size_t p1 = findParent(u);
+    size_t p2 = findParent(v);
+
+    if (p1 == p2)
+    {
+        return false;
+    }
+
+    if (sizes[p1] > sizes[p2])
+    {
+        sizes[p1] += sizes[p2];
+        parents[p2] = parents[p1];
+    }
+
+    else
+    {
+        sizes[p1] += sizes[p2];
+        parents[p2] = parents[p1];
+    }
+
+    return true;
+}
+
+Graph Graph::Kruskal() const
+{
+    std::vector<std::vector<long long>> edges;
+    for (int i = 0; i < vec.size(); ++i)
+    {
+        for (auto& elem : vec[i])
+        {
+            edges.push_back({i, static_cast<long long>(elem.first), elem.second});
+        }
+    }
+
+    std::sort(edges.begin(), edges.end(), [](const std::vector<long long>& vec1, const std::vector<long long>& vec2)
+    {
+        return vec1[2] < vec2[2];
+    });
+
+    Union un(vec.size());
+
+    Graph result;
+    for (auto& elem : edges)
+    {
+        if (un.unionFind(elem[0], elem[1]))
+        {
+            result.addEdge(elem[0], elem[1], elem[2]);
         }
     }
 

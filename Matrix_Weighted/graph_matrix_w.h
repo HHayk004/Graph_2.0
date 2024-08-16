@@ -12,6 +12,19 @@
 class Graph
 {
 private:
+    class Union
+    {
+        public:
+            Union(const size_t& size);
+
+            size_t findParent(const size_t& u);
+            bool unionFind(const size_t& u, const size_t& v);
+
+        private:
+            std::vector<size_t> parents;
+            std::vector<size_t> sizes;
+    };
+
     void printDfsRecH(const size_t& index2, std::vector<bool>& visited) const;
     
     std::vector<size_t> constructPath(const std::vector<size_t>& visited, size_t& dest) const;
@@ -42,6 +55,9 @@ public:
 
     ~Graph() = default;
 
+    Graph& operator=(const Graph& gr) = default;
+    Graph& operator=(Graph&& gr) = default;
+
     void addEdge(const size_t& index1, const size_t& index2, const size_t& w);
     void addVertex(const size_t& add_size = 1);
 
@@ -60,6 +76,7 @@ public:
 
     void printBfs(const size_t& index) const;
 
+    void printGraph() const;
     std::vector<size_t> printLevelDfs(const size_t& index, const size_t& level) const; // have some questions
     std::vector<size_t> printLevelBfs(const size_t& index, size_t level) const;
 

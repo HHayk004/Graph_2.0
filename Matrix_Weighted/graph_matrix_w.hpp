@@ -24,7 +24,7 @@ void Graph::addEdge(const size_t& index1, const size_t& index2, const size_t& w)
 
 void Graph::addVertex(const size_t& add_size)
 {
-    for (int i = 0; i < vec.size(); ++i)
+    for (size_t i = 0; i < vec.size(); ++i)
     {
         vec[i].resize(vec.size() + add_size);
     }
@@ -48,9 +48,9 @@ void Graph::removeVertex(const size_t& vertex)
     {
         vec.erase(vec.begin() + vertex);
     
-        for (int i = 0; i < vec.size(); ++i)
+        for (size_t i = 0; i < vec.size(); ++i)
         {
-            for (int j = vertex; j < vec[i].size(); ++j)
+            for (size_t j = vertex; j < vec[i].size(); ++j)
             {
                 if (vec[i][j])
                 {
@@ -93,6 +93,19 @@ size_t Graph::edgeCount() const
     return edges_count;
 }
 
+void Graph::printGraph() const
+{
+    for (size_t i = 0; i < vec.size(); ++i)
+    {
+        std::cout << i << " - ";
+        for (size_t j = 0; j < vec.size(); ++j)
+        {
+            std::cout << vec[i][j] << ' ';
+        }
+        std::cout << std::endl;
+    }
+}
+
 void Graph::printDfsIterative(const size_t& index) const
 {
     std::stack<size_t> indexes;
@@ -108,7 +121,7 @@ void Graph::printDfsIterative(const size_t& index) const
 
         std::cout << curr << ' ';
 
-        for (int j = 0; j < vec.size(); ++j)
+        for (size_t j = 0; j < vec.size(); ++j)
         {
             if (vec[curr][j] && !visited[j])
             {
@@ -127,7 +140,7 @@ void Graph::printDfsRecH(const size_t& index, std::vector<bool>& visited) const
 
     std::cout << index << ' ';
 
-    for (int i = 0; i < vec.size(); ++i)
+    for (size_t i = 0; i < vec.size(); ++i)
     {
         if (vec[index][i] && !visited[i])
         {
@@ -162,7 +175,7 @@ void Graph::printBfs(const size_t& index) const
 
         std::cout << curr << ' ';
 
-        for (int i = 0; i < vec.size(); ++i)
+        for (size_t i = 0; i < vec.size(); ++i)
         {
             if (vec[curr][i] && !visited[i])
             {
@@ -188,9 +201,9 @@ void Graph::transpose()
 {
     std::vector<std::vector<long long>> new_graph(vec.size(), std::vector<long long>(vec.size(), 0));
 
-    for (int i = 0; i < vec.size(); ++i)
+    for (size_t i = 0; i < vec.size(); ++i)
     {
-        for (int j = 0; j < vec.size(); ++j)
+        for (size_t j = 0; j < vec.size(); ++j)
         {
             new_graph[i][j] = vec[j][i];
         }
@@ -218,9 +231,9 @@ void Graph::levelRec(const size_t& level, std::vector<bool>& visited, std::vecto
     if (level)
     {
         std::vector<size_t> new_level;
-        for (int elem : result)
+        for (size_t elem : result)
         {
-            for (int i = 0; i < vec.size(); ++i)
+            for (size_t i = 0; i < vec.size(); ++i)
             {
                 if (vec[elem][i] && !visited[i])
                 {
@@ -262,7 +275,7 @@ std::vector<size_t> Graph::printLevelBfs(const size_t& index, size_t level) cons
         size_t curr = indexes.front();
         indexes.pop();
 
-        for (int i = 0; i < vec.size(); ++i)
+        for (size_t i = 0; i < vec.size(); ++i)
         {
             if (vec[curr][i] && !visited[i])
             {
@@ -305,7 +318,7 @@ void Graph::allPathesRec(const size_t& source, const size_t& dest, std::vector<s
 
     else
     {
-        for (int i = 0; i < vec.size(); ++i)
+        for (size_t i = 0; i < vec.size(); ++i)
         {
             if (vec[source][i] && !visited[i])
             {
@@ -339,7 +352,7 @@ bool Graph::hasCycleRec(const size_t& index, const size_t& parent,
     path[index] = true;
     visited[index] = true;
 
-    for (int elem = 0; elem < vec.size(); ++elem)
+    for (size_t elem = 0; elem < vec.size(); ++elem)
     {
         if (vec[index][elem] && 
             (elem != parent && path[elem] ||
@@ -358,7 +371,7 @@ bool Graph::hasCycle() const
     std::vector<bool> visited(vec.size(), false);
     std::vector<bool> path(vec.size(), false);
 
-    for (int i = 0; i < vec.size(); ++i)
+    for (size_t i = 0; i < vec.size(); ++i)
     {
         if (!visited[i] && hasCycleRec(i, -1, visited, path))
         {
@@ -374,7 +387,7 @@ bool Graph::topoRec(const size_t& i, std::vector<size_t>& result, std::vector<bo
     visited[i] = true;
     path[i] = true;
 
-    for (int elem = 0; elem < vec.size(); ++elem)
+    for (size_t elem = 0; elem < vec.size(); ++elem)
     {
         if (vec[i][elem])
         {
@@ -406,7 +419,7 @@ std::vector<size_t> Graph::topoDfs() const
     std::vector<bool> visited(vec.size(), false);
     std::vector<size_t> result;
 
-    for (int i = 0; i < vec.size(); ++i)
+    for (size_t i = 0; i < vec.size(); ++i)
     {
         if (!visited[i] && topoRec(i, result, visited, path))
         {
@@ -424,9 +437,9 @@ std::vector<size_t> Graph::topoKahn() const
     std::vector<size_t> result;
     
     std::vector<size_t> parent(vec.size(), 0);
-    for (int i = 0; i < vec.size(); ++i)
+    for (size_t i = 0; i < vec.size(); ++i)
     {
-        for (int j = 0; j < vec.size(); ++j)
+        for (size_t j = 0; j < vec.size(); ++j)
         {
             if (vec[i][j])
             {
@@ -445,14 +458,14 @@ std::vector<size_t> Graph::topoKahn() const
             indexes.pop();
         }
 
-        for (int i = 0; i < vec.size(); ++i)
+        for (size_t i = 0; i < vec.size(); ++i)
         {
             if (!parent[i])
             {
                 parent[i] = -1;
                 indexes.push(i);
 
-                for (int elem = 0; elem < vec.size(); ++elem)
+                for (size_t elem = 0; elem < vec.size(); ++elem)
                 {
                     if (vec[i][elem])
                     {
@@ -591,7 +604,7 @@ std::vector<std::vector<size_t>> Graph::tarjan() const
     std::vector<std::vector<size_t>> result;
 
     size_t ip = 0;
-    for (int i = 0; i < vec.size(); ++i)
+    for (size_t i = 0; i < vec.size(); ++i)
     {
         if (ip_vec[i] == -1)
         {
@@ -599,7 +612,7 @@ std::vector<std::vector<size_t>> Graph::tarjan() const
         }
     }
 
-    // for (int i = 0; i < vec.size(); ++i)
+    // for (size_t i = 0; i < vec.size(); ++i)
     // {
     //     std::cout << i << ": " << ip_vec[i] << ' ' << ll_vec[i] << std::endl;
     // } for checking if ll values for each SCC is the same (not)
@@ -623,7 +636,7 @@ std::vector<long long> Graph::SSSP(const size_t& source) const
     {
         if (result[val] != std::numeric_limits<long long>::max())
         {
-            for (int elem = 0; elem < vec.size(); ++elem)
+            for (size_t elem = 0; elem < vec.size(); ++elem)
             {
                 if (vec[val][elem])
                 {
@@ -660,7 +673,7 @@ std::vector<std::pair<std::vector<size_t>, long long>> Graph::dijkstra(const siz
         
         visited[p.first] = true;
 
-        for (int elem = 0; elem < vec.size(); ++elem)
+        for (size_t elem = 0; elem < vec.size(); ++elem)
         {
             if (!visited[elem] && vec[p.first][elem] && result[p.first].second + vec[p.first][elem] < result[elem].second)
             {
@@ -683,13 +696,13 @@ std::vector<std::pair<std::vector<size_t>, long long>> Graph::bellmanFord(const 
 
     result[source].first.push_back(source);
 
-    for (int i = 1; i < vec.size(); ++i)
+    for (size_t i = 1; i < vec.size(); ++i)
     {
-        for (int j = 0; j < vec.size(); ++j)
+        for (size_t j = 0; j < vec.size(); ++j)
         {
             if (result[j].second != std::numeric_limits<long long>::max())
             {
-                for (int elem = 0; elem < vec.size(); ++elem)
+                for (size_t elem = 0; elem < vec.size(); ++elem)
                 {
                     if (vec[j][elem] && result[j].second + vec[j][elem] < result[elem].second)
                     {
@@ -717,18 +730,18 @@ Graph Graph::Prim() const
     };
 
     std::vector<bool> visited(vec.size(), false);
-    for (int i = 0; i < vec.size(); ++i)
+    for (size_t i = 0; i < vec.size(); ++i)
     {
         if (!visited[i])
         {
             visited[i] = true;
 
             std::priority_queue<pq_type, std::vector<pq_type>, decltype(cmp)> pq(cmp);
-            for (int elem = 0; elem < vec.size(); ++elem)
+            for (size_t elem = 0; elem < vec.size(); ++elem)
             {
                 if (vec[i][elem])
                 {
-                    pq.push({i, static_cast<long long>(elem), vec[i][elem]});
+                    pq.push({static_cast<long long>(i), static_cast<long long>(elem), vec[i][elem]});
                 }
             }
 
@@ -746,7 +759,7 @@ Graph Graph::Prim() const
 
                 visited[p[1]] = true;
 
-                for (int elem = 0; elem < vec.size(); ++elem)
+                for (size_t elem = 0; elem < vec.size(); ++elem)
                 {
                     if (vec[p[1]][elem] && !visited[elem])
                     {
@@ -757,5 +770,81 @@ Graph Graph::Prim() const
         }
     }
     
+    return result;
+}
+
+Graph::Union::Union(const size_t& size) : parents(std::vector<size_t>(size)), sizes(std::vector<size_t>(size, 1))
+{
+    for (int i = 0; i < size; ++i)
+    {
+        parents[i] = i;
+    }
+}
+
+size_t Graph::Union::findParent(const size_t& u)
+{
+    if (parents[u] != u)
+    {
+        parents[u] = findParent(parents[u]);
+    }
+
+    return parents[u];
+}
+
+bool Graph::Union::unionFind(const size_t& u, const size_t& v)
+{
+    size_t p1 = findParent(u);
+    size_t p2 = findParent(v);
+
+    if (p1 == p2)
+    {
+        return false;
+    }
+
+    if (sizes[p1] > sizes[p2])
+    {
+        sizes[p1] += sizes[p2];
+        parents[p2] = parents[p1];
+    }
+
+    else
+    {
+        sizes[p1] += sizes[p2];
+        parents[p2] = parents[p1];
+    }
+
+    return true;
+}
+
+Graph Graph::Kruskal() const
+{
+    std::vector<std::vector<long long>> edges;
+    for (size_t i = 0; i < vec.size(); ++i)
+    {
+        for (size_t j = 0; j < vec.size(); ++j)
+        {
+            if (vec[i][j])
+            {
+                edges.push_back({static_cast<long long>(i), static_cast<long long>(j), vec[i][j]});
+            }
+        }
+    }
+
+    std::sort(edges.begin(), edges.end(), [](const std::vector<long long>& vec1, const std::vector<long long>& vec2)
+    {
+        return vec1[2] < vec2[2];
+    });
+
+    Union un(vec.size());
+
+    Graph result;
+    for (auto& elem : edges)
+    {
+        if (un.unionFind(elem[0], elem[1]))
+        {
+            result.addEdge(elem[0], elem[1], elem[2]);
+        }
+    }
+
     return result;
 }
